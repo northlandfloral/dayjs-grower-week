@@ -104,7 +104,5 @@ const growerWeek = (option, dayjsClass, dayjsFactory) => {
   }
 }
 
-module.exports = {
-  growerWeek,
-  default: growerWeek,
-}
+export { growerWeek };
+export default growerWeek;
