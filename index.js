@@ -71,16 +71,25 @@ const growerWeek = (option, dayjsClass, dayjsFactory) => {
 
   const oldParse = dayjsClass.prototype.parse;
   dayjsClass.prototype.parse = function(cfg) {
-    const {date, args} = cfg
+    const { date, args } = cfg;
 
     if (args?.[1] === 'gygww') {
-      const year = parseInt(date.toString().substring(0, 4));
-      const week = parseInt(date.toString().substring(4, 6));
-      const diffWeek = getYearFirst(year, this.$u)
-      this.$d = diffWeek.add(week - 1, 'weeks').toDate()
-      this.init()
+      const dateStr = date.toString();
+      const year = parseInt(dateStr.substring(0, 4));
+      const week = parseInt(dateStr.substring(4, 6));
+      
+      // 1. Get the anchor day (Thursday) of the first week
+      let firstWeekAnchor = getYearFirst(year, this.$u);
+      
+      // 2. Snap to the Sunday of that first week
+      // Since dayjs().day(0) gets Sunday of the current week:
+      let week1Sunday = firstWeekAnchor.startOf('day').subtract(firstWeekAnchor.day(), 'days');
+      
+      // 3. Add the number of weeks (Week 11 means adding 10 weeks to Week 1)
+      this.$d = week1Sunday.add(week - 1, 'weeks').toDate();
+      this.init();
     } else {
-      oldParse.call(this, cfg)
+      oldParse.call(this, cfg);
     }
   }
 
